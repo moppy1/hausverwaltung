@@ -1,0 +1,25 @@
+.edit-btn
+{
+  cursor: pointer;
+}
+#houses-overview
+{
+  .full th
+  {
+    color: var(--bs-danger);
+  }
+  th
+  {
+    width: 50px;
+    text-align: center;
+  }
+  .space,
+  .capacity
+  {
+    width: 150px;
+  }
+  .edit
+  {
+    width: 100px;
+  }
+}
