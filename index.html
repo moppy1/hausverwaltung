@@ -37,7 +37,7 @@
             <input v-model="searchQuery" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
           </form>        
-          <button type="button" class="btn btn-outline-secondary mt-3 mt-lg-0 ms-lg-5" data-bs-toggle="modal" data-bs-target="#houseModal">
+          <button @click="configAddModal" type="button" class="btn btn-outline-secondary mt-3 mt-lg-0 ms-lg-5" data-bs-toggle="modal" data-bs-target="#houseModal">
             Haus hinzufügen 
           </button>
           <!-- <button type="button" class="btn btn-primary mt-3 mt-lg-0 ms-lg-2" id="fileImportBtn">
@@ -80,7 +80,7 @@
               <td scope="row" class="capacity">{{house.capacity}}</td>
               <td scope="row" class="space"><input v-model.number="house.space" @change="setHouseVal(index)" type="number" min="0" class="form-control p-0 border-0"></td>
               <td scope="row" class="edit">
-                <i @click="editHouse(index)" class="bi bi-pencil edit-btn" data-bs-toggle="modal" data-bs-target="#houseEditModal"></i>
+                <i @click="editHouse(index)" class="bi bi-pencil edit-btn" data-bs-toggle="modal" data-bs-target="#houseModal"></i>
               </td>
             </tr>
           </template>
@@ -90,14 +90,16 @@
 
   </div>
   
-  <!-- Modal AddHouse -->
+  <!-- Modals -->
   <div id="houseModals">
 
+    <!-- Modal-->
     <div class="modal fade" id="houseModal" tabindex="-1" aria-labelledby="houseModal" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Haus hinzufügen</h5>
+            <h5 v-if="modal.mode=='add'" class="modal-title" id="exampleModalLabel">Haus hinzufügen</h5>
+            <h5 v-if="modal.mode=='edit'" class="modal-title" id="exampleModalLabel">Haus bearbeiten</h5>
             <button @click="reset" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -130,93 +132,48 @@
                 <label class="form-label">Telefonnummer</label>
                 <input v-model="phone" type="text" class="form-control" placeholder="">
               </div>
-              <div class="col-md-6 mb-5">
+              <div class="col-md-6 mb-4">
                 <label class="form-label">E-Mail</label>
                 <input v-model="email" type="text" class="form-control" placeholder="">
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label">Anzahl Betten</label>
                 <input v-model.number="capacity" type="number" min="0" class="form-control">
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label">Freie Plätze</label>
                 <input v-model.number="space" type="number" min="0" class="form-control">
-              </div>             
+              </div>
+              <div v-if="modal.mode=='edit'" class="col-md-12 mt-5">
+                <button @click="removeHouse(index)" type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-trash me-2"></i> Haus löschen</button>
+              </div>               
             </form>
           </div>
           <div class="modal-footer">
             <button @click="reset" type="button" class="btn btn-danger" data-bs-dismiss="modal">Abbrechen</button>
-            <button @click="addHouse" type="button" class="btn btn-primary">Hinzufügen</button>
+            <button v-if="modal.mode=='add'" @click="addHouse" type="button" class="btn btn-primary">Hinzufügen</button>
+            <button v-if="modal.mode=='edit'" @click="updateHouse" type="button" class="btn btn-primary" data-bs-dismiss="modal">Speichern</button>
           </div>        
         </div>
       </div>
     </div>
-    <!-- /Modal AddHouse -->
-    
-    <!-- Modal EditHouse -->
-    <div class="modal fade" id="houseEditModal" tabindex="-1" aria-labelledby="houseEditModal" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Haus bearbeiten</h5>
-            <button @click="reset" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form class="row g-3">
-              <div class="col-md-12">
-                <label class="form-label">Name des Hauses</label>
-                <input v-model="name" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-10">
-                <label class="form-label">Straße</label>
-                <input v-model="street" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-2">
-                <label class="form-label">Nr.</label>
-                <input v-model="housenr" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">PLZ</label>
-                <input v-model="zip" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-8 mb-3">
-                <label class="form-label">Ort</label>
-                <input v-model="city" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-12">
-                <label class="form-label">Ansprechpartner</label>
-                <input v-model="contact" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Telefonnummer</label>
-                <input v-model="phone" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-6 mb-5">
-                <label class="form-label">E-Mail</label>
-                <input v-model="email" type="text" class="form-control" placeholder="">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Anzahl Betten</label>
-                <input v-model.number="capacity" type="number" min="0" class="form-control">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Freie Plätze</label>
-                <input v-model.number="space" type="number" min="0" class="form-control">
-              </div>             
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button @click="removeHouse(index)" type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal"><i class="bi bi-trash me-2"></i> Haus löschen</button>
-            <button @click="reset" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-            <button @click="updateHouse" type="button" class="btn btn-primary" data-bs-dismiss="modal">Speichern</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- /Modal EditHouse -->
+    <!-- /Modal-->
 
   </div>
-          
+  <!-- /Modals -->
+
+  <!-- Toast -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="toast" class="toast text-white bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+      <div class="toast-body">
+        Synchronisation erfolgreich!
+      </div>
+    </div>
+  </div>
+  <!-- /Toast -->
+  
+  <!-- Scripts -->
   <script type="text/javascript" src="js/app.js"></script>
+  <!-- /Scripts -->
 </body>
 </html>

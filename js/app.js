@@ -13,6 +13,7 @@ let vHouses = new Vue(
   mounted()
   {
     this._getHouses();
+    this.m_notification = $('#toast');
   },
 
   methods: 
@@ -53,6 +54,11 @@ let vHouses = new Vue(
       vHouseEditor.contact = house.contact;
       vHouseEditor.capacity = house.capacity;
       vHouseEditor.space = house.space;
+      vHouseEditor.modal.mode = 'edit';
+    },
+    configAddModal()
+    {
+      vHouseEditor.modal.mode = 'add';
     },
     setHouseVal(index)
     {
@@ -88,13 +94,16 @@ let vHouses = new Vue(
       const cb = (data) =>
       {
         for(let house in data)
-          this.addHouse(data[house], false)
+          this.addHouse(data[house], false);
+        console.log('Synchronisation erfolgreich')
+        ui.showNotification('Synchronisation erfolgreich')
       };
       db.getData(cb)
     },
     _setHouses()
     {
       db.setData(JSON.stringify(this.houses));
+      ui.showNotification('Erfolgreich gespeichert')
     }
   },
 
@@ -146,7 +155,12 @@ let vHouseEditor = new Vue(
     capacity: 0,
     space: 0,
     index: undefined,
-    coords: []
+    coords: [],
+    modal: 
+    {
+      mode: '',
+      title: ''
+    }
   }, 
   
   methods: 
@@ -220,3 +234,17 @@ let vHouseEditor = new Vue(
   }
 });
 
+//##############################################################################
+class UI
+{
+  constructor()
+  {
+    this.m_notification = $('#toast');
+  }
+  showNotification(text)
+  {
+    this.m_notification.find('.toast-body').text(text)
+    this.m_notification.toast('show');
+  }
+}
+const ui = new UI();
