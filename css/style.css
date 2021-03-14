@@ -9,3 +9,6 @@
 #houses-overview .space,
 #houses-overview .capacity {
   width: 150px; }
+
+.fs-small {
+  font-size: .5rem; }

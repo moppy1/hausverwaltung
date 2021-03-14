@@ -7,12 +7,17 @@ let vHouses = new Vue(
   data: {
     title: 'Hausverwaltung',
     searchQuery: '',
-    houses: []
+    houses: [],
+    meta:
+    {
+      lastSaved: '',
+      lastAccess: ''
+    }
   },
 
   mounted()
   {
-    this._getHouses();
+    this._getData();
     this.m_notification = $('#toast');
   },
 
@@ -26,13 +31,13 @@ let vHouses = new Vue(
 
       this.houses.push(house);
       if(toServer)
-        this._setHouses(); 
+        this._saveData(); 
     },
     removeHouse(index)
     {
       const house = this.getHouseByIndex(index);
       this.houses.splice(index,1)
-      this._setHouses();
+      this._saveData();
     },
     reset()
     {
@@ -63,12 +68,15 @@ let vHouses = new Vue(
     setHouseVal(index)
     {
       const house = this.getHouseByIndex(index);
-      if(!house)
-        return
+      if(!house) return
+      
       this.updateHouse(index, house);
     },
     updateHouse(index, houseData)
     {
+      const house = this.getHouseByIndex(index);
+      if(!house) return
+
       this.houses[index].name = houseData.name;
       this.houses[index].street = houseData.street;
       this.houses[index].housenr = houseData.housenr;
@@ -80,29 +88,44 @@ let vHouses = new Vue(
       this.houses[index].capacity = houseData.capacity;
       this.houses[index].space = houseData.space;
 
-      const house = this.getHouseByIndex(index);
-      if(!house)
-        return
-      this._setHouses();
+      this._saveData();
     },
     getHouseByIndex(index)
     {
       return this.houses[index]
     },
-    _getHouses()
+    _getData()
     {
       const cb = (data) =>
       {
-        for(let house in data)
+        if(data.meta == undefined)
+        {
+          for(let house in data)
           this.addHouse(data[house], false);
-        console.log('Synchronisation erfolgreich')
-        ui.showNotification('Synchronisation erfolgreich')
+        }
+        else
+        {
+          this.meta = data.meta;
+          const houses = data.houses
+          for(let house in houses)
+            this.addHouse(houses[house], false);
+        };
+        let msg = 
+          `Synchronisation erfolgreich<br>
+          <span class="fw-lighter">Gespeichert am: ${data.meta.lastSaved}</span>`
+        ui.showNotification(msg)
       };
       db.getData(cb)
     },
-    _setHouses()
+    _saveData()
     {
-      db.setData(JSON.stringify(this.houses));
+      this.meta.lastSaved = moment().format('LLL');
+      const data = 
+      {
+        meta: this.meta,
+        houses: this.houses
+      }
+      db.setData(JSON.stringify(data));
       ui.showNotification('Erfolgreich gespeichert')
     }
   },
@@ -240,11 +263,16 @@ class UI
   constructor()
   {
     this.m_notification = $('#toast');
+    this.initMoment();  
   }
-  showNotification(text)
+  showNotification(data)
   {
-    this.m_notification.find('.toast-body').text(text)
+    this.m_notification.find('.toast-body').html(data)
     this.m_notification.toast('show');
+  }
+  initMoment()
+  {
+    moment.locale('de', moment.localeData["de"])
   }
 }
 const ui = new UI();

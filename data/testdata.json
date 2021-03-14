@@ -1,0 +1,106 @@
+{
+    "title": "Hausverwaltung",
+    "searchQuery": "",
+    "houses": [
+        {
+            "name": "ABS",
+            "zip": "99084",
+            "city": "Erfurt",
+            "capacity": 12,
+            "space": 4,
+            "street": "Gartenweg",
+            "housenr": "5"
+        },
+        {
+            "name": "Kinderheim am Stadtwald",
+            "zip": "99974",
+            "city": "Mühlhausen",
+            "capacity": 50,
+            "space": 10
+        },
+        {
+            "name": "Kinder- und Jugendheim Benshausen e.V.",
+            "zip": "98544",
+            "city": "Zella-Mehlis",
+            "capacity": 90,
+            "space": 0
+        },
+        {
+            "name": "Kinderheim",
+            "zip": "98746",
+            "city": "Mellenbach-Glasbach",
+            "capacity": 61,
+            "space": 19
+        },
+        {
+            "name": "Kinderarche Thüringen e.V.",
+            "zip": "07751",
+            "city": "Jena",
+            "capacity": 20,
+            "space": 0
+        },
+        {
+            "name": "Städt. Kinderheim",
+            "zip": "98530",
+            "city": "Marisfeld",
+            "capacity": 20,
+            "space": 10
+        },
+        {
+            "name": "Kinderheim Priorat \"Eichenweg 24b\"",
+            "zip": "99974",
+            "city": "Mühlhausen",
+            "capacity": 14,
+            "space": 0,
+            "street": "Eichenweg",
+            "housenr": "24b"
+        },
+        {
+            "name": "Albert-Schweitzer-Kinderdorf Thüringen e.V.",
+            "zip": "99097",
+            "city": "Erfurt",
+            "capacity": 30,
+            "space": 7
+        },
+        {
+            "name": "Kinderheim Paul Hildebrand",
+            "zip": "98574",
+            "city": "Schmalkalden",
+            "capacity": 33,
+            "space": 1
+        },
+        {
+            "name": "Kinderheim Friedensberg",
+            "zip": "07745",
+            "city": "Jena",
+            "capacity": 28,
+            "space": 5
+        },
+        {
+            "name": "Kinderheim Klostermühle",
+            "zip": "99880",
+            "city": "Waltershausen",
+            "capacity": 54,
+            "space": 19
+        },
+        {
+            "name": "Kinderheim Kinderland",
+            "zip": "99734",
+            "city": "Nordhausen",
+            "capacity": 36,
+            "space": 4
+        },
+        {
+            "name": "Haus Berta",
+            "street": "Klappenweg",
+            "housenr": "15",
+            "zip": "37339",
+            "city": "Teistungen",
+            "phone": "01712793835",
+            "email": "mario.seideneck@gmx.de",
+            "contact": "Mario Seideneck",
+            "capacity": 3,
+            "space": 1
+        }
+    ]
+}

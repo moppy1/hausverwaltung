@@ -17,6 +17,7 @@
   <!-- 3rd JS -->
   <script type="text/javascript" src="js/3rd/jquery-3.6.0.js"></script>
   <script type="text/javascript" src="js/3rd/bootstrap.bundle.js"></script>
+  <script type="text/javascript" src="js/3rd/moment-with-locales.js"></script>
   <script type="text/javascript" src="js/3rd/vue.js"></script>
   <!-- Own JS -->
   <script type="text/javascript" src="js/database.js"></script>
@@ -37,7 +38,7 @@
             <input v-model="searchQuery" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
           </form>        
-          <button @click="configAddModal" type="button" class="btn btn-outline-secondary mt-3 mt-lg-0 ms-lg-5" data-bs-toggle="modal" data-bs-target="#houseModal">
+          <button @click="configAddModal" type="button" class="btn btn-primary mt-3 mt-lg-0 ms-lg-5" data-bs-toggle="modal" data-bs-target="#houseModal">
             Haus hinzufügen 
           </button>
           <!-- <button type="button" class="btn btn-primary mt-3 mt-lg-0 ms-lg-2" id="fileImportBtn">
@@ -80,7 +81,7 @@
               <td scope="row" class="capacity">{{house.capacity}}</td>
               <td scope="row" class="space"><input v-model.number="house.space" @change="setHouseVal(index)" type="number" min="0" class="form-control p-0 border-0"></td>
               <td scope="row" class="edit">
-                <i @click="editHouse(index)" class="bi bi-pencil edit-btn" data-bs-toggle="modal" data-bs-target="#houseModal"></i>
+                <i @click="editHouse(index)" class="bi bi-pencil edit-btn" data-bs-toggle="modal" data-bs-target="#houseModal" title="Haus bearbeiten"></i>
               </td>
             </tr>
           </template>
