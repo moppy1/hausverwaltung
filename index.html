@@ -19,8 +19,9 @@
   <script type="text/javascript" src="js/3rd/bootstrap.bundle.js"></script>
   <script type="text/javascript" src="js/3rd/vue.js"></script>
   <!-- Own JS -->
-
-
+  <script type="text/javascript" src="js/database.js"></script>
+  <script type="text/javascript" src="js/map.js"></script>
+  <script type="text/javascript" src="js/fileHandler.js"></script>
 </head>
 <body>
   <div id="app">
@@ -31,26 +32,39 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler01" aria-controls="navbarToggler01" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse pt-4" id="navbarToggler01">          
+        <div class="collapse navbar-collapse pt-4 pt-lg-0" id="navbarToggler01">          
           <form class="d-flex ms-lg-auto">
             <input v-model="searchQuery" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
           </form>        
-          <button type="button" class="btn btn-outline-secondary mt-3 mt-lg-0 ms-lg-3" data-bs-toggle="modal" data-bs-target="#houseModal">
+          <button type="button" class="btn btn-outline-secondary mt-3 mt-lg-0 ms-lg-5" data-bs-toggle="modal" data-bs-target="#houseModal">
             Haus hinzufügen 
           </button>
+          <!-- <button type="button" class="btn btn-primary mt-3 mt-lg-0 ms-lg-2" id="fileImportBtn">
+            <i class="bi bi-cloud-upload me-2"></i>Import
+          </button>
+          <form style="display: none;">
+            <input type="file" accept=".csv" class="form-control-file" id="fileImport" style="display: none;">
+          </form>
+          <button type="button" class="btn btn-light mt-3 mt-lg-0 ms-lg-2">            
+            <form class="fileFormExport">              
+              <a download="file.txt" class="downloadButton form-control-file fileExportData" id="exportBtn"><i class="bi bi-cloud-download me-2"></i>Export</a>
+            </form>
+          </button> -->
         </div>
       </div>
     </nav>
     <!-- /Header -->
     
-    <div class="container mt-5">
+    <div class="container overflow-auto">
       
-      <table class="table">
+      <table class="table table-hover">
         <thead>
           <tr>
             <th scope="col"></th>
             <th scope="col">Haus</th>
+            <th scope="col" class="d-none d-xl-table-cell">PLZ</th>
+            <th scope="col" class="d-none d-xl-table-cell">Ort</th>
             <th scope="col">Kapazität</th>
             <th scope="col">Freie Plätze</th>
             <th scope="col"></th>
@@ -58,15 +72,15 @@
         </thead>
         <tbody id="houses-overview">
           <template v-for="(house,index) in filteredHouses">
-            <!-- <house-row :house="house" :index="index"></house-row> -->
             <tr :data-idx="index" :class="{full: house.space == 0}">
               <th scope="row" class="nr">{{index+1}}</th>
               <td scope="row" class="name">{{house.name}}</td>
+              <td scope="row" class="zip d-none d-xl-table-cell">{{house.zip}}</td>
+              <td scope="row" class="location d-none d-xl-table-cell">{{house.city}}</td>
               <td scope="row" class="capacity">{{house.capacity}}</td>
               <td scope="row" class="space"><input v-model.number="house.space" @change="setHouseVal(index)" type="number" min="0" class="form-control p-0 border-0"></td>
               <td scope="row" class="edit">
-                <i @click="removeHouse(index)" class="bi bi-trash edit-btn"></i>
-                <i @click="editHouse(index)" class="bi bi-pencil edit-btn ms-lg-2" data-bs-toggle="modal" data-bs-target="#houseEditModal"></i>
+                <i @click="editHouse(index)" class="bi bi-pencil edit-btn" data-bs-toggle="modal" data-bs-target="#houseEditModal"></i>
               </td>
             </tr>
           </template>
@@ -80,11 +94,11 @@
   <div id="houseModals">
 
     <div class="modal fade" id="houseModal" tabindex="-1" aria-labelledby="houseModal" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Haus hinzufügen</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button @click="reset" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form class="row g-3">
@@ -92,13 +106,33 @@
                 <label class="form-label">Name des Hauses</label>
                 <input v-model="name" type="text" class="form-control" placeholder="">
               </div>
+              <div class="col-md-10">
+                <label class="form-label">Straße</label>
+                <input v-model="street" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Nr.</label>
+                <input v-model="housenr" type="text" class="form-control" placeholder="">
+              </div>
               <div class="col-md-4">
                 <label class="form-label">PLZ</label>
                 <input v-model="zip" type="text" class="form-control" placeholder="">
               </div>
-              <div class="col-md-8 mb-4">
+              <div class="col-md-8 mb-3">
                 <label class="form-label">Ort</label>
                 <input v-model="city" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">Ansprechpartner</label>
+                <input v-model="contact" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Telefonnummer</label>
+                <input v-model="phone" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-6 mb-5">
+                <label class="form-label">E-Mail</label>
+                <input v-model="email" type="text" class="form-control" placeholder="">
               </div>
               <div class="col-md-4">
                 <label class="form-label">Anzahl Betten</label>
@@ -111,7 +145,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button @click="reset" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            <button @click="reset" type="button" class="btn btn-danger" data-bs-dismiss="modal">Abbrechen</button>
             <button @click="addHouse" type="button" class="btn btn-primary">Hinzufügen</button>
           </div>        
         </div>
@@ -121,11 +155,11 @@
     
     <!-- Modal EditHouse -->
     <div class="modal fade" id="houseEditModal" tabindex="-1" aria-labelledby="houseEditModal" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Haus bearbeiten</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button @click="reset" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form class="row g-3">
@@ -133,13 +167,33 @@
                 <label class="form-label">Name des Hauses</label>
                 <input v-model="name" type="text" class="form-control" placeholder="">
               </div>
+              <div class="col-md-10">
+                <label class="form-label">Straße</label>
+                <input v-model="street" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Nr.</label>
+                <input v-model="housenr" type="text" class="form-control" placeholder="">
+              </div>
               <div class="col-md-4">
                 <label class="form-label">PLZ</label>
                 <input v-model="zip" type="text" class="form-control" placeholder="">
               </div>
-              <div class="col-md-8 mb-4">
+              <div class="col-md-8 mb-3">
                 <label class="form-label">Ort</label>
                 <input v-model="city" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">Ansprechpartner</label>
+                <input v-model="contact" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Telefonnummer</label>
+                <input v-model="phone" type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-6 mb-5">
+                <label class="form-label">E-Mail</label>
+                <input v-model="email" type="text" class="form-control" placeholder="">
               </div>
               <div class="col-md-4">
                 <label class="form-label">Anzahl Betten</label>
@@ -152,7 +206,8 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            <button @click="removeHouse(index)" type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal"><i class="bi bi-trash me-2"></i> Haus löschen</button>
+            <button @click="reset" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
             <button @click="updateHouse" type="button" class="btn btn-primary" data-bs-dismiss="modal">Speichern</button>
           </div>
         </div>

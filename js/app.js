@@ -7,16 +7,12 @@ let vHouses = new Vue(
   data: {
     title: 'Hausverwaltung',
     searchQuery: '',
-    houses: [],
-    url3: 'http://localhost/ms3',
-    url1: 'http://ms3.bplaced.net/hps/data/db.json',
-    url: 'https://json.extendsclass.com/bin/d19ba4868121',
-    apiKey: '0c3782c5-83f7-11eb-a665-0242ac110002'
+    houses: []
   },
 
   mounted()
   {
-    this.fetchHouses();
+    this._getHouses();
   },
 
   methods: 
@@ -29,14 +25,13 @@ let vHouses = new Vue(
 
       this.houses.push(house);
       if(toServer)
-        this.fetchAddHouse(house) 
+        this._setHouses(); 
     },
     removeHouse(index)
     {
       const house = this.getHouseByIndex(index);
       this.houses.splice(index,1)
-      this.fetchDeleteHouse(house.id)
-
+      this._setHouses();
     },
     reset()
     {
@@ -48,9 +43,14 @@ let vHouses = new Vue(
       if(!house)
         return
       vHouseEditor.index = index;
+      vHouseEditor.street = house.street;
+      vHouseEditor.housenr = house.housenr;
       vHouseEditor.name = house.name;
       vHouseEditor.zip = house.zip;
       vHouseEditor.city = house.city;
+      vHouseEditor.phone = house.phone;
+      vHouseEditor.email = house.email;
+      vHouseEditor.contact = house.contact;
       vHouseEditor.capacity = house.capacity;
       vHouseEditor.space = house.space;
     },
@@ -64,74 +64,37 @@ let vHouses = new Vue(
     updateHouse(index, houseData)
     {
       this.houses[index].name = houseData.name;
+      this.houses[index].street = houseData.street;
+      this.houses[index].housenr = houseData.housenr;
       this.houses[index].zip = houseData.zip;
       this.houses[index].city = houseData.city;
+      this.houses[index].phone = houseData.phone;
+      this.houses[index].email = houseData.email;
+      this.houses[index].contact = houseData.contact;
       this.houses[index].capacity = houseData.capacity;
       this.houses[index].space = houseData.space;
 
       const house = this.getHouseByIndex(index);
       if(!house)
         return
-      this.fetchUpdateHouse(house.id, house);
+      this._setHouses();
     },
     getHouseByIndex(index)
     {
       return this.houses[index]
     },
-    async fetchHouses(house)
+    _getHouses()
     {
-      await fetch(this.url, {
-        headers: {
-            'Content-type': 'application/json',
-            'Access-Control-Allow-Origin': 'http://localhost:3000',
-            'Access-Control-Allow-Credentials': 'true'
-          }
-      })
-      .then(response => response.json())
-      .then(data => 
-        {
-          for(let house in data)
-           this.addHouse(data[house], false)
-        });
+      const cb = (data) =>
+      {
+        for(let house in data)
+          this.addHouse(data[house], false)
+      };
+      db.getData(cb)
     },
-    async fetchAddHouse(house)
+    _setHouses()
     {
-      const result = await fetch(this.url, {
-        method: 'PUT',
-        body: JSON.stringify(this.houses),
-        headers: {
-          'Content-type': 'application/json',
-          'Api-key': this.apiKey,
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
-          'Access-Control-Allow-Credentials': 'true'
-        }
-      })
-    },
-    async fetchUpdateHouse(id, house)
-    {
-      await fetch(this.url, {
-        method: 'PUT',
-        body: JSON.stringify(this.houses),
-        headers: {
-          'Content-type': 'application/json',
-          'Api-key': this.apiKey,
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
-          'Access-Control-Allow-Credentials': 'true'
-        }
-      })
-    },
-    async fetchDeleteHouse(id)
-    {
-      await fetch(this.url, {
-        method: 'PUT',
-        body: JSON.stringify(this.houses),
-        headers: {
-          'Content-type': 'application/json',
-          'Api-key': this.apiKey,
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
-          'Access-Control-Allow-Credentials': 'true'
-        }
-      })
+      db.setData(JSON.stringify(this.houses));
     }
   },
 
@@ -159,7 +122,7 @@ let vHouses = new Vue(
       deep: true,
       handler()
       {
-        
+
       }
     }
   }
@@ -173,11 +136,17 @@ let vHouseEditor = new Vue(
   el: '#houseModals',
   data: {
     name: '',
+    street: '',
+    housenr: '',
     zip: '',
     city: '',
+    phone: '',
+    email: '',
+    contact: '',
     capacity: 0,
     space: 0,
-    index: undefined
+    index: undefined,
+    coords: []
   }, 
   
   methods: 
@@ -187,8 +156,13 @@ let vHouseEditor = new Vue(
       const house = 
       {
         name: this.name,
+        street: this.street,
+        housenr: this.housenr,
         zip: this.zip,
         city: this.city,
+        phone: this.phone,
+        email: this.email,
+        contact: this.contact,
         capacity: this.capacity,
         space: this.space
       }
@@ -200,22 +174,48 @@ let vHouseEditor = new Vue(
       const house = 
       {
         name: this.name,
+        street: this.street,
+        housenr: this.housenr,
         zip: this.zip,
         city: this.city,
+        phone: this.phone,
+        email: this.email,
+        contact: this.contact,
         capacity: this.capacity,
         space: this.space
       }
       vHouses.updateHouse(this.index, house);
       this.reset();
     },
+    removeHouse()
+    {
+      vHouses.removeHouse(this.index);
+      this.reset();
+    },
     reset()
     {
       this.name = '';
+      this.street = '';
+      this.housenr = '';
       this.zip = '';
       this.city = '';
+      this.phone = '';
+      this.email = '';
+      this.contact = '';
       this.capacity = 0;
       this.index = undefined;
       this.space = 0;
+      this.coords = [];
+    },
+    getCoodinates()
+    {
+      const cb = (result) =>
+      {
+        console.log(result)
+        if(result && result.length > 0)
+          this.coords = [result[0].lon, result[0].lat]
+      }
+      return map.getCoords(this.zip, this.city, this.street, this.housenr, cb);
     }
   }
 });
