@@ -18,7 +18,6 @@ let vHouses = new Vue(
   mounted()
   {
     this._getData();
-    this.m_notification = $('#toast');
   },
 
   methods: 
@@ -96,8 +95,14 @@ let vHouses = new Vue(
     },
     _getData()
     {
-      const cb = (data) =>
+      const loadCb = (data,err) =>
       {
+        if(err != undefined)
+        {
+          ui.addNotification(`Synchronisation fehlgeschlagen (Error: ${err})`, 'error');
+          return
+        }
+
         if(data.meta == undefined)
         {
           for(let house in data)
@@ -111,9 +116,10 @@ let vHouses = new Vue(
             this.addHouse(houses[house], false);
         };
 
-        ui.showNotification('Synchronisation erfolgreich');
+        ui.addNotification('Synchronisation erfolgreich','ok',2000);
       };
-      db.getData(cb)
+
+      db.getData(loadCb)
     },
     _saveData()
     {
@@ -123,8 +129,17 @@ let vHouses = new Vue(
         meta: this.meta,
         houses: this.houses
       }
-      db.setData(JSON.stringify(data));
-      ui.showNotification('Erfolgreich gespeichert')
+
+      const saveCb = (err) =>
+      {
+        if(err != undefined)
+        {
+          ui.addNotification(`Speichern fehlgeschlagen (Error: ${err})`, 'error');
+          return
+        }
+        ui.showNotification('Erfolgreich gespeichert','ok',2000)
+      }
+      db.setData(JSON.stringify(data),saveCb);
     }
   },
 
@@ -261,13 +276,51 @@ class UI
   constructor()
   {
     this.m_notification = $('#toast');
+    this.m_notificationContent = this.m_notification.find('.toast-body')
+
+    this.m_toastStack = $('#toast-stack');
+
     this.initMoment();  
   }
-  showNotification(data)
+
+  // ............
+  showNotification(data,type='ok',duration)
   {
-    this.m_notification.find('.toast-body').html(data)
+    this.m_notification.toggleClass('bg-danger', type=='error');
+    this.m_notificationContent.html(data);
     this.m_notification.toast('show');
   }
+
+  // ............
+  addNotification(data,type,duration)
+  {
+    let toastEl = 
+      $('<div id="toast" class="toast text-white bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true"/>')
+      .toggleClass('bg-danger', type=='error')
+
+    const toastHeader = 
+      $(`<div class="toast-header">
+          <strong class="me-auto">Fehler</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+         </div>`);
+    const toastContent = $(`<div class="toast-body">${data}</div>`);
+
+    if(duration === undefined) 
+      toastEl.append(toastHeader);
+    
+    toastEl.append(toastContent).appendTo(this.m_toastStack)
+    let opts = 
+    {
+      autohide: duration != undefined
+    }
+    if(duration != undefined)
+      opts.delay = duration;
+
+    const toast = new bootstrap.Toast(toastEl[0], opts);
+    toast.show();
+  }
+
+  // ............
   initMoment()
   {
     moment.locale('de', moment.localeData["de"])
