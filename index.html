@@ -25,17 +25,23 @@
   <script type="text/javascript" src="js/fileHandler.js"></script>
 </head>
 <body>
+
+  <!-- App -->
   <div id="app">
+
     <!-- Header -->  
-    <nav class="navbar navbar-expand-lg navbar-light bg-light p-3 px-md-4 mb-3 bg-body border-bottom">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-3 px-md-4 border-bottom">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">{{title}}</a>
+        <a class="navbar-brand" href="#">
+          {{title}}
+          <div id="status" :data-value="meta.lastSaved">Letzte Änderung: </div>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler01" aria-controls="navbarToggler01" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse pt-4 pt-lg-0" id="navbarToggler01">          
           <form class="d-flex ms-lg-auto">
-            <input v-model="searchQuery" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <input v-model="searchQuery" class="form-control me-2" type="search" placeholder="Suche" aria-label="Search">
             <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
           </form>        
           <button @click="configAddModal" type="button" class="btn btn-primary mt-3 mt-lg-0 ms-lg-5" data-bs-toggle="modal" data-bs-target="#houseModal">
@@ -57,16 +63,16 @@
     </nav>
     <!-- /Header -->
     
-    <div class="container overflow-auto">
-      
-      <table class="table table-hover">
+    <!-- Main -->
+    <main class="overflow-auto scroll-container pt-4">
+      <table class="table table-hover container">
         <thead>
           <tr>
             <th scope="col"></th>
             <th scope="col">Haus</th>
             <th scope="col" class="d-none d-xl-table-cell">PLZ</th>
             <th scope="col" class="d-none d-xl-table-cell">Ort</th>
-            <th scope="col">Kapazität</th>
+            <th scope="col" class="d-none d-lg-table-cell">Kapazität</th>
             <th scope="col">Freie Plätze</th>
             <th scope="col"></th>
           </tr>
@@ -78,7 +84,7 @@
               <td scope="row" class="name">{{house.name}}</td>
               <td scope="row" class="zip d-none d-xl-table-cell">{{house.zip}}</td>
               <td scope="row" class="location d-none d-xl-table-cell">{{house.city}}</td>
-              <td scope="row" class="capacity">{{house.capacity}}</td>
+              <td scope="row" class="capacity d-none d-lg-table-cell">{{house.capacity}}</td>
               <td scope="row" class="space"><input v-model.number="house.space" @change="setHouseVal(index)" type="number" min="0" class="form-control p-0 border-0"></td>
               <td scope="row" class="edit">
                 <i @click="editHouse(index)" class="bi bi-pencil edit-btn" data-bs-toggle="modal" data-bs-target="#houseModal" title="Haus bearbeiten"></i>
@@ -87,9 +93,11 @@
           </template>
         </tbody>
       </table>    
-    </div>
+    </main>
+    <!-- /Main -->
 
   </div>
+  <!-- /App -->
   
   <!-- Modals -->
   <div id="houseModals">

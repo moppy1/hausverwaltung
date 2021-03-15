@@ -110,10 +110,8 @@ let vHouses = new Vue(
           for(let house in houses)
             this.addHouse(houses[house], false);
         };
-        let msg = 
-          `Synchronisation erfolgreich<br>
-          <span class="fw-lighter">Gespeichert am: ${data.meta.lastSaved}</span>`
-        ui.showNotification(msg)
+
+        ui.showNotification('Synchronisation erfolgreich');
       };
       db.getData(cb)
     },

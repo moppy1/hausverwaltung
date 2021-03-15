@@ -1,3 +1,41 @@
+html,
+body,
+#app
+{
+  height: 100%;
+}
+#app
+{
+  display: flex;
+  flex-direction: column;
+}
+nav
+{
+  flex: 0 1 auto;
+}
+.scroll-container
+{
+  flex: 1 1 auto;
+}
+.navbar-brand
+{
+  position: relative;
+}
+#status
+{
+  position: absolute;
+  width: 100%;
+  font-size: .7rem;
+  bottom: -.7rem;
+  left: 0;
+  pointer-events: none;
+
+  &[data-value]::after
+  {
+    content: attr(data-value);
+  }
+}
+
 .edit-btn
 {
   cursor: pointer;
@@ -16,7 +54,7 @@
   .space,
   .capacity
   {
-    width: 150px;
+    width: 120px;
   }
 }
 
