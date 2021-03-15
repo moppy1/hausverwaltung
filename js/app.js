@@ -217,7 +217,7 @@ let vHouseEditor = new Vue(
         space: this.space
       }
       vHouses.addHouse(house)
-      this.reset();      
+      this.reset();
     },
     updateHouse(index)
     {
@@ -280,7 +280,8 @@ class UI
 
     this.m_toastStack = $('#toast-stack');
 
-    this.initMoment();  
+    this.initMoment();
+    this.initModals();
   }
 
   // ............
@@ -324,6 +325,15 @@ class UI
   initMoment()
   {
     moment.locale('de', moment.localeData["de"])
+  }
+
+  // .............
+  initModals()
+  {
+    $('#houseModal').on('hidden.bs.modal', () =>
+    {
+      vHouseEditor.reset();
+    });
   }
 }
 const ui = new UI();
